@@ -7,26 +7,35 @@
 #include <memory>
 #include "Task.h"
 #include <condition_variable>
+#include "State.h"
 
 namespace ThreadPool
 {
+
+
 	class ThreadPoolExecutor
 	{
 	public:
-		ThreadPoolExecutor(int maxWorkers);
+		ThreadPoolExecutor(int numWorkers);
 		~ThreadPoolExecutor();
 		void ScheduleTask(std::function<void()> task);
 		void Run();
+		void ShutDown();
+		void CreateThread();
+		void RemoveThread();
 
 	private:
-		int maxWorkers;
-		std::vector<std::thread> workers;
-		std::thread poolManager;
-		std::queue<std::function<void()>> taskQueue;
-		std::condition_variable notEmptyTaskQueue;
+		state m_state;
+		int m_numWorkers;
+		bool m_finishingThread;
+		std::vector<std::thread> m_workers;
+		std::thread m_poolManager;
+		std::mutex m_taskQueueMutex;
+		std::mutex m_guard;
+		std::queue<std::function<void()>> m_taskQueue;
+		std::condition_variable m_notEmptyTaskQueue;
 		void ManagePool();
-		std::mutex taskQueueMutex;
-		void Worker();
+		void RunWorker();
 	};
 }
 

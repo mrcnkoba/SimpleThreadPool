@@ -8,7 +8,7 @@ int main()
 {
 	ThreadPoolExecutor executor = ThreadPoolExecutor(4);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		int random = std::rand() % 6;
 		std::chrono::seconds timeout(random);
@@ -19,12 +19,14 @@ int main()
 	}
 
 	executor.Run();
-	
+	executor.RemoveThread();
 	ExampleTask task;
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 	executor.ScheduleTask(task);
-	std::this_thread::sleep_for(std::chrono::seconds(15));
+	executor.CreateThread();
+	
 		
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		int random = std::rand() % 6;
 		std::chrono::seconds timeout(random);
@@ -34,5 +36,6 @@ int main()
 		});
 	}
 
+	executor.ShutDown();
 	return 0;
 }
